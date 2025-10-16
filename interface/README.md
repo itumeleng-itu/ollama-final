@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# NeuroChat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![NeuroChat Logo](public/neurochat-logo.svg)
 
-Currently, two official plugins are available:
+## A Simple React GUI for Ollama AI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Welcome to **NeuroChat**, a powerful and intuitive web-based chat interface that allows you to interact with locally running Large Language Models (LLMs) via Ollama. This project provides a seamless experience for developers and users to chat with AI models directly from their web browser, offering a personal AI you can build with.
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Interactive Chat Interface:** A clean and responsive UI designed to feel like a messaging app, with user prompts on one side and AI responses on the other.
+*   **Ollama Integration:** Seamless communication with your locally running Ollama instance using the `http://localhost:11434/api/generate` endpoint.
+*   **Real-time AI Responses:** Get instant replies from your chosen LLM.
+*   **Loading Spinner:** A visual indicator to show when the app is waiting for an AI response.
+*   **AI Response Metrics:** Displays useful metrics for AI responses, including duration, tokens per second, and total tokens generated.
+*   **Customizable AI Model:** Easily switch between different Ollama models (e.g., `tinyllama`, `gemma:2b`) by updating the `App.tsx` file.
 
-## Expanding the ESLint configuration
+## ⚙️ Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Follow these steps to set up and run NeuroChat on your local machine.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Before you begin, ensure you have the following installed:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   [Node.js](https://nodejs.org/) (which includes npm)
+*   [Ollama](https://ollama.com/)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Step 1: Install and Run Ollama
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Ollama allows you to run open-source large language models locally. If you haven't already, install Ollama for your operating system:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   **Windows:** Download the [Windows version from the official Ollama website](https://ollama.com/download/windows).
+
+Once installed, Ollama will run in the background.
+
+#### Download an AI Model
+
+Next, you'll need to download an AI model to use with Ollama. We recommend a model less than 1GB for a good balance of performance and resource usage. For example, to pull the `tinyllama` model:
+
+1.  **Browse the Library:** Go to the [official Ollama Library](https://ollama.com/library) to explore available models.
+2.  **Choose a Model:** Select a model that fits your needs (e.g., `tinyllama`).
+3.  **Copy the Pull Command:** On the model's page, you'll find the exact command to download it (e.g., `ollama pull tinyllama`).
+4.  **Run the Command:** Open your terminal and paste the command:
+    ```bash
+    ollama pull tinyllama
+    ```
+    This might take a few minutes as it's a large file.
+
+You can verify the model is running by typing `ollama list` in your terminal. You should see your chosen model in the list.
+
+### Step 2: Set Up and Run the React App
+
+1.  **Navigate to the `interface` directory:**
+    ```bash
+    cd interface
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+
+    The application will start, and you can access it in your web browser, typically at `http://localhost:5173`.
+
+## 💡 Usage
+
+Open your web browser and navigate to the address provided by `npm run dev` (e.g., `http://localhost:5173`).
+
+*   Type your prompt into the input field at the bottom of the chat interface.
+*   Press `Enter` or click the `Send` button to send your message.
+*   The AI's response will appear in the chat display, along with performance metrics.
+
+## 🛠️ Technologies Used
+
+*   **React:** A JavaScript library for building user interfaces.
+*   **TypeScript:** A typed superset of JavaScript that compiles to plain JavaScript.
+*   **Vite:** A fast build tool for modern web projects.
+*   **Ollama:** A framework for running large language models locally.
+*   **HTML & CSS:** For structuring and styling the web application.
+
+## License
+
+This project is open-source and available under the [MIT License](LICENSE).
