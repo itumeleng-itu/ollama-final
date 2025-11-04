@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { Spinner } from './components/ui/spinner';
 import { Button } from './components/ui/button';
@@ -14,10 +14,38 @@ interface Message {
   };
 }
 
+const STORAGE_KEY = 'novaChat_messages';
+
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  // Load messages from localStorage on component mount
+  useEffect(() => {
+    const loadMessages = () => {
+      try {
+        const storedMessages = localStorage.getItem(STORAGE_KEY);
+        if (storedMessages) {
+          const parsed = JSON.parse(storedMessages);
+          setMessages(parsed);
+        }
+      } catch (error) {
+        console.error('Error loading messages from localStorage:', error);
+      }
+    };
+
+    loadMessages();
+  }, []); // Empty dependency array - runs once on mount
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (error) {
+      console.error('Error saving messages to localStorage:', error);
+    }
+  }, [messages]); // Runs whenever messages array changes
 
   const sendMessage = async () => {
     if (input.trim() === '') return;
@@ -34,7 +62,15 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tinyllama', //my installed model
+          model: 'tinyllama',
+          system: `You are Nova, a helpful AI assistant specializing in UI/UX design. You are assisting a user named Dlozi.
+        
+        Important instructions:
+        - Always maintain a friendly, professional tone
+        - Provide practical UI/UX advice and suggestions
+        - Be concise but thorough in your explanations
+        - When appropriate, refer to yourself as Nova
+        - Focus on modern design principles and best practices`,
           prompt: input,
           stream: false,
         }),
@@ -72,50 +108,69 @@ function App() {
     }
   };
 
+  // Function to clear chat history
+  const clearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
     <>
-    <div className="border-1 rounded-lg h-auto m-80 p-1">
-      <div className="rounded-xl h-auto">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.role}`}>
-            {msg.content}
+      <div className="border border-gray-300 rounded-lg h-auto w-full max-w-3xl p-4 mx-auto mt-15 text-center shadow-lg">
+        <div className="flex justify-between items-center mb-4 px-2">
+          <h2 className="text-lg font-bold">NovaChat</h2>
+          <Button
+            onClick={clearChat}
+            variant="outline"
+            size="sm"
+            disabled={loading || messages.length === 0}
+          >
+            New Chat
+          </Button>
+        </div>
+        <hr  className='p-5'/>
+        <div className="rounded-xl h-auto">
+          {messages.map((msg, index) => (
+            <div key={index} className={`message ${msg.role}`}>
+              {msg.content}
 
-            {/* Only show metrics for AI responses */}
-            {msg.role === 'assistant' && msg.metrics && (
-              <div className="flex gap-3 mt-2 pt-2 border-t border-white/10 text-xs opacity-70">
-                <p className="m-0 font-bold">Duration: {msg.metrics.duration.toFixed(2)}s</p>
-                <p className="m-0 font-bold">Tokens/sec: {msg.metrics.tokensPerSec.toFixed(1)} tok/s</p>
-                <p className="m-0 font-bold">Total tokens: {msg.metrics.totalTokens} tokens</p>
-              </div>
-            )}
-          </div>
-        ))}
+              {/* Only show metrics for AI responses */}
+              {msg.role === 'assistant' && msg.metrics && (
+                <div className="flex gap-3 mt-2 pt-2 border-t border-white/10 text-xs opacity-70">
+                  <p className="m-0 font-bold">Duration: {msg.metrics.duration.toFixed(2)}s</p>
+                  <p className="m-0 font-bold">Tokens/sec: {msg.metrics.tokensPerSec.toFixed(1)} tok/s</p>
+                  <p className="m-0 font-bold">Total tokens: {msg.metrics.totalTokens} tokens</p>
+                </div>
+              )}
+            </div>
+          ))}
 
-        {loading && (
-          <div>
-            <Spinner className="h-8 w-8" />
-          </div>
-        )}
+          {loading && (
+            <div>
+              <Spinner className="h-8 w-8" />
+            </div>
+          )}
+        </div>
+
+        <div className="area">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !loading && sendMessage()}
+            placeholder="Ask anything you want..."
+            disabled={loading}
+          />
+          <Button
+            className="bg-transparent rounded-lg"
+            size={'lg'}
+            onClick={sendMessage}
+            disabled={loading}
+          >
+            <img src={send} alt="send" className="h-8 w-8" />
+          </Button>
+        </div>
       </div>
-
-      <div className="area">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask anything you want..."
-          disabled={loading}
-        />
-        <Button
-          className="bg-transparent rounded-lg"
-          size={'lg'}
-          onClick={sendMessage}
-          disabled={loading}
-        >
-          <img src={send} alt="send" className="h-8 w-8" />
-        </Button>
-      </div>
-    </div>
     </>
   );
 }
